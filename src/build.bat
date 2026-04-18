@@ -1,0 +1,1 @@
+g++ main.cpp -o Fortune-Wheel.exe -lwinmm -lpthread -lm
