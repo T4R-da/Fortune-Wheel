@@ -133,6 +133,7 @@ int main() {
                     playerBalance += betQueue.back().amount;
                     betQueue.pop_back();
                 }
+                system("cls");
                 continue;
             }
             // ── Queue a new bet on current selection ─────────────────────────
@@ -159,6 +160,7 @@ int main() {
                 }
 
                 ci.bVisible = FALSE; SetConsoleCursorInfo(ch, &ci);
+                system("cls");
                 continue;
             }
             // ── Spin all queued bets ─────────────────────────────────────────
