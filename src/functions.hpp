@@ -22,6 +22,13 @@
 // Globals
 inline int playerBalance = 1000;
 
+// --- Bet Entry ---
+struct BetEntry {
+    int cursor;
+    int amount;
+    std::string label; // human-readable name
+};
+
 // --- TIMING UTILS ---
 inline void sleepMs(int ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
@@ -73,15 +80,12 @@ public:
 
 // --- UI Utilities ---
 inline void clearScreen() {
-    // This moves the "drawing pencil" back to the top left 
-    // without actually erasing the screen, preventing the flicker.
     COORD cursorPosition;
     cursorPosition.X = 0;
     cursorPosition.Y = 0;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cursorPosition);
 }
 
-// It helps avoiding the screen stutter
 inline void hideCursor() {
     HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_CURSOR_INFO info;
@@ -130,13 +134,9 @@ inline void printRouletteTable(int selection = -1) {
             }
         }
         
-        // Corrected Column IDs: Row 3 = 38, Row 2 = 39, Row 1 = 40
         int colBetId = (row == 3) ? 38 : (row == 2 ? 39 : 40);
         std::cout << (selection == colBetId ? MAGENTA : GREEN) << " (2to1)" << RESET << "\n";
     }
-
-    // Dozens and Outside bets... (keep existing code)
-
 
     // Outside Bets (Dozens)
     std::cout << "    " << (selection == 41 ? MAGENTA : GREEN) << "    [  1st 12  ]" << RESET 
@@ -152,6 +152,22 @@ inline void printRouletteTable(int selection = -1) {
               << (selection == 49 ? MAGENTA : GREEN) << "[19-36]" << RESET << "\n\n";
 }
 
+// Prints the queued bets panel below the table
+inline void printBetQueue(const std::vector<BetEntry>& bets, int totalWagered) {
+    if (bets.empty()) {
+        std::cout << CYAN << "  Bet Queue: (empty)  " << RESET << "                              \n";
+    } else {
+        std::cout << CYAN << BOLD << "  Bet Queue:" << RESET << "                              \n";
+        for (size_t i = 0; i < bets.size(); ++i) {
+            std::cout << "    " << YELLOW << "[" << (i + 1) << "]" << RESET
+                      << " $" << bets[i].amount
+                      << " on " << BOLD << bets[i].label << RESET
+                      << "                    \n";
+        }
+        std::cout << CYAN << "  Total wagered: $" << totalWagered << RESET << "                    \n";
+    }
+}
+
 // --- ANIMATION UTILS ---
 inline void rollAnimation(RouletteWheel& wheel) {
     std::cout << YELLOW << BOLD << "\nSPINNING THE WHEEL..." << RESET << "\n[ ";
@@ -159,8 +175,8 @@ inline void rollAnimation(RouletteWheel& wheel) {
         const Pocket& temp = wheel.spin();
         std::string color = (temp.getColor() == "Red") ? RED : (temp.getColor() == "Black" ? BOLD : GREEN);
         std::cout << color << temp.number << RESET << " ";
-        std::cout.flush(); // Force output to show immediately
-        sleepMs(50 + (i * 10)); // Gradually slows down the spin
+        std::cout.flush();
+        sleepMs(50 + (i * 10));
     }
     std::cout << "]\n";
 }
