@@ -290,10 +290,10 @@ int main() {
                     if (winnings > 0) {
                         anyWin = true;
                         totalWon += winnings;
-                        std::cout << GREEN << "  WIN  $" << winnings
+                        std::cout << GREEN << " WIN " << winnings
                                   << " on " << b.label << RESET << "\n";
                     } else {
-                        std::cout << RED << "  LOSS $" << b.amount
+                        std::cout << RED << " LOSS " << b.amount
                                   << " on " << b.label << RESET << "\n";
                     }
                 }
